@@ -8,6 +8,7 @@ const ACCESS_KEY = import.meta.env.VITE_APP_ACCESS_KEY;
 function App() {
   const [currentImage, setCurrentImage] = useState(null);
   const [prevImages, setPrevImages] = useState([]);
+  const [quota, setQuota] = useState(null);
 
   const [inputs, setInputs] = useState({
     url: "",
@@ -17,6 +18,14 @@ function App() {
     width: "",
     height: "",
   });
+
+  const getQuota = async () => {
+    const response = await fetch("https://api.apiflash.com/v1/urltoimage/quota?access_key=" + ACCESS_KEY);
+    const result = await response.json();
+
+    setQuota(result);
+
+  }
 
   const reset = () => {
     setInputs({
@@ -60,6 +69,7 @@ function App() {
       setCurrentImage(json.url);
       setPrevImages((images) => [...images, json.url]);
       reset();
+      getQuota();
     }
   }
   
@@ -76,6 +86,14 @@ function App() {
 
   return (
     <div className="whole-page">
+      {quota ? (
+        <p className="quota">
+          {" "}
+          Remaining API calls: {quota.remaining} out of {quota.limit}
+        </p>
+      ) : (
+        <p></p>
+      )}
       <h1>Build Your Own Screenshot! 📸</h1>
       
       <APIForm
